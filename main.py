@@ -51,7 +51,13 @@ def convert_csv_minus_one_minute(
 def normalize_date_format(date_format: str) -> str:
     date_format = date_format.strip()
     date_format = date_format.replace("mm", "%m").replace("dd", "%d").replace("yyyy", "%Y")
-    date_format = date_format.replace("hh", "%H").replace("HH", "%H").replace("MM", "%M")
+    date_format = date_format.replace("MM", "%m").replace("DD", "%d").replace("YYYY", "%Y")
+    return date_format
+
+
+def normalize_time_format(date_format: str) -> str:
+    date_format = date_format.strip()
+    date_format = date_format.replace("hh", "%H").replace("HH", "%H").replace("MM", "%M").replace("mm", "%M")
     return date_format
 
 
@@ -69,9 +75,9 @@ def make_conversion():
             return
 
         in_date_format = normalize_date_format(in_date_var.get() or "mm/dd/yyyy")
-        in_time_format = normalize_date_format(in_time_var.get() or "hh:mm")
+        in_time_format = normalize_time_format(in_time_var.get() or "hh:mm")
         out_date_format = normalize_date_format(out_date_var.get() or "mm/dd/yyyy")
-        out_time_format = normalize_date_format(out_time_var.get() or "hh:mm")
+        out_time_format = normalize_time_format(out_time_var.get() or "hh:mm")
 
         out_path = convert_csv_minus_one_minute(path, in_date_format, in_time_format, out_date_format, out_time_format)
         messagebox.showinfo("Success!", f"Conversion finished: \n{out_path}")
