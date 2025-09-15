@@ -87,7 +87,7 @@ def convert_csv_minus_one_minute(
     with (open(source_path, "r", encoding="utf-8", newline="") as input_file,
           open(result_path, "w", encoding="utf-8", newline="") as result_file):
         reader = csv.reader(input_file)
-        writer = csv.writer(result_file, lineterminator="\n")
+        writer = csv.writer(result_file)
 
         header = next(reader)
         writer.writerow(header)
