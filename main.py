@@ -11,12 +11,6 @@ from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 from typing import Callable, TextIO
 
-root = tk.Tk()
-in_file_var = tk.StringVar()
-in_date_var = tk.StringVar(value="mm/dd/yyyy")
-in_time_var = tk.StringVar(value="hh:mm")
-out_date_var = tk.StringVar(value="mm/dd/yyyy")
-out_time_var = tk.StringVar(value="hh:mm")
 
 
 def process_row(
@@ -147,7 +141,7 @@ def normalize_time_format(date_format: str) -> str:
     return date_format
 
 
-def browse():
+def browse(in_file_var: tk.StringVar):
     path = filedialog.askopenfilename(title="Select file", filetypes=[("Text", "*.txt")])
     if path:
         in_file_var.set(path)
@@ -159,6 +153,7 @@ def make_conversion(
         in_time_format: str,
         out_date_format: str,
         out_time_format: str,
+        root: tk.Tk,
         on_progress: Callable[[float], None],
         on_complete: Callable[[], None],
 ):
@@ -167,6 +162,13 @@ def make_conversion(
 
 
 def build_ui():
+    root = tk.Tk()
+    in_file_var = tk.StringVar()
+    in_date_var = tk.StringVar(value="mm/dd/yyyy")
+    in_time_var = tk.StringVar(value="hh:mm")
+    out_date_var = tk.StringVar(value="mm/dd/yyyy")
+    out_time_var = tk.StringVar(value="hh:mm")
+
     root.title("Tradestation to MT data converter")
 
     try:
@@ -184,7 +186,7 @@ def build_ui():
     ttk.Label(main, text="Tradestation data file:").grid(row=0, column=0, sticky="e", padx=(0, 8), pady=(0, 8))
     entry_file = ttk.Entry(main, textvariable=in_file_var)
     entry_file.grid(row=0, column=1, sticky="ew", pady=(0, 8))
-    ttk.Button(main, text="Browse…", command=browse).grid(row=0, column=2, padx=(8, 0), pady=(0, 8))
+    ttk.Button(main, text="Browse…", command=lambda: browse(in_file_var)).grid(row=0, column=2, padx=(8, 0), pady=(0, 8))
 
     formats = ttk.Frame(main)
     formats.grid(row=1, column=0, columnspan=3, sticky="nsew")
@@ -251,7 +253,7 @@ def build_ui():
 
         btn.config(state="disabled")
         pb["value"] = 0.0
-        args = (path, in_date_format, in_time_format, out_date_format, out_time_format, on_progress, on_complete)
+        args = (path, in_date_format, in_time_format, out_date_format, out_time_format, root, on_progress, on_complete)
         threading.Thread(target=make_conversion, daemon=True, name="convert-thread", args=args).start()
 
     btn.config(command=on_convert_button_clicked)
@@ -273,4 +275,7 @@ def main():
 
 
 if __name__ == "__main__":
+    import multiprocessing as mp
+
+    mp.freeze_support()
     main()
